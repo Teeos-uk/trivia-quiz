@@ -26,6 +26,7 @@ function selected_pressed(id) {
   // add pressed character in available_chars
   available_chars = available_chars + pressed_char;
   
+  status = '';
   update_view();
 }
 
@@ -40,6 +41,13 @@ function available_pressed(id) {
   // add pressed character in selected_chars
   selected_chars = selected_chars + pressed_char;
   
+  // checking whether user has selected all letters
+  if (available_chars.length === 0)
+    if (selected_chars == answer.toUpperCase())
+      status = "Correct";
+    else
+      status = "Wrong";
+  
   update_view();
 }
 
@@ -50,28 +58,48 @@ function update_view() {
   for (var i in available_chars) {
     var button = document.createElement('button');
     button.innerHTML = available_chars[i];
-    //button.id = "available_char-" + i;
-    // add click event
+    button.style.width = '40px';
+    button.style.height = '40px';
     button.addEventListener('click', available_pressed.bind(null, i));
     available_chars_div.appendChild(button);
   }
-  
   // update selected characters
   var selected_chars_div = document.getElementById('selected_chars');
   selected_chars_div.innerHTML = '';
   for (var i in selected_chars) {
     var button = document.createElement('button');
     button.innerHTML = selected_chars[i];
-    
+    button.style.width = '40px';
+    button.style.height = '40px';
     button.addEventListener('click', selected_pressed.bind(null, i));
     selected_chars_div.appendChild(button);
   }
-  
+  // update status message
+  var status_header = document.getElementById('status');
+  status_header.innerHTML = status;
+  // update 'next' button
+  var next_button = document.getElementById('next');
+  if (status == 'Correct')
+    next_button.innerHTML = 'Next question';
+  else
+    next_button.innerHTML = 'Skip question';
+  // update question text
 }
 
-var answer = "Bingo"
+function new_question() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", 'http://jservice.io/api/random', false);
+  xhttp.send();
+  return JSON.parse(xhttp.responseText)[0];
+}
+
+var question_obj = new_question();
+
+var status = '';
+var question = question_obj['question'];
+document.getElementById('question').innerHTML = question;
+var answer = question_obj['answer'];
 var available_chars = shuffle(answer.toUpperCase());
 // shuffle available_chars
-var selected_chars = [];
-
+var selected_chars = '';
 update_view();
