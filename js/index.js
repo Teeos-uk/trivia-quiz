@@ -88,7 +88,7 @@ function update_view() {
 
 function new_question() {
   var xhttp = new XMLHttpRequest();
-  xhttp.open("GET", 'http://jservice.io/api/random', false);
+  xhttp.open("GET", 'https://jservice.io/api/random', false);
   xhttp.send();
   return JSON.parse(xhttp.responseText)[0];
 }
