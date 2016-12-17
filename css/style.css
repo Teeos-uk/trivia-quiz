@@ -2,6 +2,7 @@
 * {
     padding: 0px;
     margin: 0px;
+    font-family: 'Roboto', sans-serif;
 }
 
 #header-container {
@@ -81,6 +82,20 @@
     color: white;
     box-shadow: 2px 2px 4px #AAA;
 }
+
+#status-container {
+    margin-top: 10px;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    font-size: 150%;
+}
+
+/*
+#status {
+    font-size: 150%;
+}
+*/
 
 .letter-container {
     min-height: 100px;

@@ -3,6 +3,7 @@
 <html>
     <head>
         <link rel="stylesheet" href="css/style.css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
         <script src="js/index.js"></script>
     </head>
 
@@ -19,7 +20,7 @@
         <div id="body-container">
             <div id="counters">
                 <div id="correct-answers">
-                    <p>Correct answers: 0</p>
+                    <p>Correct answers: <span id="correct-answers-text"></span></p>
                 </div>
                 <div id="total-questions">
                     <p>Total questions: <span id="total-questions-text"></span></p>
@@ -40,6 +41,10 @@
             
             <div id="skip">
                 <button id="skip-button">SKIP</button>
+            </div>
+
+            <div id="status-container">
+                <span id="status">&#10003;Correct!</span>
             </div>
 
             <div id="selected-letters" class="letter-container"></div>
