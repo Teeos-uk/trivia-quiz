@@ -1,105 +1,125 @@
-function randrange(floor, ceil) {
-  return Math.floor(Math.random()*(ceil - floor) + floor);
+window.onload = function() {
+    
+    var model = {
+        init: function() {
+            localStorage.question = "";
+            localStorage.answer = "";
+            localStorage.available_letters = "";
+            localStorage.selected_letters = "";
+            localStorage.category = "";
+            localStorage.question_number = "";
+            localStorage.correct_answers = 0;
+            localStorage.total_questions = 0;
+        },
+
+        load_new_question: function() {
+            var question_object = {};
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", 'http://jservice.io/api/random', false);
+            xhttp.send();
+                    
+            question_object = JSON.parse(xhttp.responseText)[0];
+                                        
+            localStorage.question = question_object.question;
+            localStorage.answer = question_object.answer;
+
+            localStorage.available_letters = localStorage.answer.toUpperCase();
+            //localStorage.available_letters = shuffle(localStorage.available_letters);
+
+            localStorage.selected_letters = "";
+            localStorage.category = question_object.category.title;
+            localStorage.question_number = question_object.id;
+            //console.log(question_object);
+ 
+        },
+
+        is_valid: function(question) {
+            if (question.length == 0)
+                return false;
+            var forbidden_chars = "<>()[] ";
+            for (var i in question) {
+                if (question.indexOf(forbidden_chars[i]) != -1)
+                    return false;
+            }
+            return true;
+        },
+    }
+
+    var view = {
+        init: function() {
+            var skip_button = document.getElementById("skip-button");
+            skip_button.addEventListener('click', controller.skip_question);
+        },
+
+        update: function() {
+            // updating spans
+            var question_text_span = document.getElementById('question-text');
+            question_text_span.innerHTML = localStorage.question;
+
+            var category_text_span = document.getElementById('category-text');
+            category_text_span.innerHTML = localStorage.category;
+
+            var number_text_span = document.getElementById('number-text');
+            number_text_span.innerHTML = localStorage.question_number;
+
+            var total_questions_span = document.getElementById('total-questions-text');
+            total_questions_span.innerHTML = localStorage.total_questions;
+
+            // updating buttons
+            var available_letters_div = document.getElementById('available-letters');
+            available_letters_div.innerHTML = "";
+            for (var i in localStorage.available_letters) {
+                var button = document.createElement('button');
+                button.innerHTML = localStorage.available_letters[i];
+                button.id = 'available_' + i;
+                button.addEventListener('click', controller.select_letter.bind(null, i));
+                available_letters_div.appendChild(button);
+            }
+        },
+    }
+
+    var controller = {
+        init: function() {
+            model.init();
+            view.init();
+            model.load_new_question();
+            view.update();
+        },
+
+        skip_question: function() {
+            console.log("Skipping a question");
+            model.load_new_question();
+            localStorage.total_questions++;
+            view.update();
+        },
+
+        select_letter: function(id) {
+            var pressed_letter = localStorage.available_letters[id];
+            console.log(pressed_letter);
+        },
+
+        deselect_letter: function() {
+            
+        }
+    }
+
+    controller.init();
+
 }
 
 function shuffle(str) {
-  var array = str.split('');
-  var buffer = 0;
-  var random_index = 0;
-  for (var i = 0; i < array.length; i++) {
-    random_index = randrange(i, array.length);
-    buffer = array[i];
-    array[i] = array[random_index];
-    array[random_index] = buffer;
-  }
-  return array.join('');
+    var array = str.split('');
+    var buffer = 0;
+    var random_index = 0;
+    for (var i in array) {
+        random_index = randrange(i, array.length);
+        buffer = array[i];
+        array[i] = array[random_index];
+        array[random_index] = buffer;
+    }
+    return array.join('');
 }
 
-function selected_pressed(id) {
-  var pressed_char = selected_chars[id];
-  
-  // cut the pressed character out from available_chars
-  var selected_chars_array = selected_chars.split('');
-  selected_chars_array.splice(id, 1);
-  selected_chars = selected_chars_array.join('');
-  
-  // add pressed character in available_chars
-  available_chars = available_chars + pressed_char;
-  
-  status = '';
-  update_view();
+function randrange(floor, ceil) {
+    return Math.floor(Math.random()*(ceil - floor) + floor);
 }
-
-function available_pressed(id) {
-  var pressed_char = available_chars[id];
-  
-  // cut the pressed character out from available_chars
-  var available_chars_array = available_chars.split('');
-  available_chars_array.splice(id, 1);
-  available_chars = available_chars_array.join('');
-  
-  // add pressed character in selected_chars
-  selected_chars = selected_chars + pressed_char;
-  
-  // checking whether user has selected all letters
-  if (available_chars.length === 0)
-    if (selected_chars == answer.toUpperCase())
-      status = "Correct";
-    else
-      status = "Wrong";
-  
-  update_view();
-}
-
-function update_view() {
-  // update available characters
-  var available_chars_div = document.getElementById('available_chars');
-  available_chars_div.innerHTML = '';
-  for (var i in available_chars) {
-    var button = document.createElement('button');
-    button.innerHTML = available_chars[i];
-    button.style.width = '40px';
-    button.style.height = '40px';
-    button.addEventListener('click', available_pressed.bind(null, i));
-    available_chars_div.appendChild(button);
-  }
-  // update selected characters
-  var selected_chars_div = document.getElementById('selected_chars');
-  selected_chars_div.innerHTML = '';
-  for (var i in selected_chars) {
-    var button = document.createElement('button');
-    button.innerHTML = selected_chars[i];
-    button.style.width = '40px';
-    button.style.height = '40px';
-    button.addEventListener('click', selected_pressed.bind(null, i));
-    selected_chars_div.appendChild(button);
-  }
-  // update status message
-  var status_header = document.getElementById('status');
-  status_header.innerHTML = status;
-  // update 'next' button
-  var next_button = document.getElementById('next');
-  if (status == 'Correct')
-    next_button.innerHTML = 'Next question';
-  else
-    next_button.innerHTML = 'Skip question';
-  // update question text
-}
-
-function new_question() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.open("GET", 'https://jservice.io/api/random', false);
-  xhttp.send();
-  return JSON.parse(xhttp.responseText)[0];
-}
-
-var question_obj = new_question();
-
-var status = '';
-var question = question_obj['question'];
-document.getElementById('question').innerHTML = question;
-var answer = question_obj['answer'];
-var available_chars = shuffle(answer.toUpperCase());
-// shuffle available_chars
-var selected_chars = '';
-update_view();
